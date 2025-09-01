@@ -1,0 +1,14 @@
+apiVersion: v2
+name: orderservice
+description: A Helm chart for OrderService
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - orderservice
+  - api
+  - microservice
+home: https://github.com/your-org/monorepo
+maintainers:
+  - name: Team
+    email: team@company.com
