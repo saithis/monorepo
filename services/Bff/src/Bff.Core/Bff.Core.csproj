@@ -5,8 +5,6 @@
     <RootNamespace>Bff.Core</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" />
-  </ItemGroup>
+
 
 </Project>
