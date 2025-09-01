@@ -7,7 +7,7 @@ A monorepo containing multiple .NET microservices with isolated dependencies and
 ```
 monorepo/
 ├── .github/                    # GitHub Actions workflows
-├── global/                     # Global configuration
+├── docs/                     # Global Documentation
 ├── services/                   # Microservices
 │   ├── Bff/                   # Backend for Frontend (contains Angular)
 │   ├── UserService/           # User management service
