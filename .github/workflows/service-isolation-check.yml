@@ -1,0 +1,65 @@
+name: Service Isolation Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'services/**'
+      - '.github/workflows/service-isolation-check.yml'
+
+jobs:
+  check-service-isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PowerShell
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Check service isolation using PowerShell script
+        id: isolation-check
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Running service isolation check using PowerShell script..."
+          
+          # Run the PowerShell script
+          $scriptPath = Join-Path $PWD "tools/check-service-isolation.ps1"
+          
+          if (Test-Path $scriptPath) {
+            Write-Host "Found script at: $scriptPath"
+            
+            # Run the script and capture the exit code
+            & $scriptPath
+            $exitCode = $LASTEXITCODE
+            
+            if ($exitCode -eq 0) {
+              Write-Host "✅ Service isolation check passed!"
+              echo "result=success" >> $env:GITHUB_OUTPUT
+            } else {
+              Write-Host "❌ Service isolation check failed!"
+              echo "result=failure" >> $env:GITHUB_OUTPUT
+            }
+          } else {
+            Write-Host "❌ Service isolation script not found at: $scriptPath"
+            echo "result=failure" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Fail PR if violations found
+        if: steps.isolation-check.outputs.result == 'failure'
+        run: |
+          echo "🚨 Service isolation check failed!"
+          echo "This PR contains cross-service references which violate the monorepo architecture."
+          echo "Please fix these issues before merging:"
+          echo "1. Remove any ProjectReference elements that point to other services"
+          echo "2. Remove any using statements that reference other services"
+          echo "3. Ensure each service is completely self-contained"
+          exit 1
+
+      - name: Success message
+        if: steps.isolation-check.outputs.result == 'success'
+        run: |
+          echo "✅ Service isolation check passed!"
+          echo "All services maintain proper boundaries and isolation."

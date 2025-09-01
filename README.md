@@ -46,6 +46,9 @@ monorepo/
 # Run e2e tests
 cd e2e
 npm run test:e2e
+
+# Check service isolation
+./tools/check-service-isolation.ps1
 ```
 
 ## CI/CD
@@ -55,10 +58,11 @@ GitHub Actions automatically:
 - Builds only affected services
 - Runs unit tests for changed services
 - Executes global e2e tests
+- **Enforces service isolation** via separate workflow (blocks PRs with project references between services)
 
 ## Architecture Principles
 
-- **Service Isolation**: No cross-service dependencies
+- **Service Isolation**: No project references between services (enforced by CI/CD)
 - **Centralized Package Management**: Directory.Build.props per service
 - **Incremental Building**: Only build what changed
 - **Comprehensive Testing**: Unit tests per service + global e2e tests
