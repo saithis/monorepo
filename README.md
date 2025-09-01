@@ -1,3 +1,5 @@
+# Notice: This is all AI generated and only used to explore ideas and sketch them. It doesn't actually work without fixing a lot of stuff.
+
 # .NET Monorepo
 
 A monorepo containing multiple .NET microservices with isolated dependencies and centralized package management.
