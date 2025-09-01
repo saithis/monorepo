@@ -61,6 +61,7 @@ GitHub Actions automatically:
 - Runs unit tests for changed services
 - Executes global e2e tests
 - **Enforces service isolation** via separate workflow (blocks PRs with project references between services)
+- **Multi-service PR protection** - adds required checkbox when 2+ services are modified
 
 ## Architecture Principles
 
