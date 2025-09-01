@@ -14,6 +14,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
       bff-changed: ${{ steps.changes.outputs.bff }}
       userservice-changed: ${{ steps.changes.outputs.userservice }}
       orderservice-changed: ${{ steps.changes.outputs.orderservice }}
