@@ -1,0 +1,189 @@
+name: Multi-Service PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-multi-service-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect service changes
+        id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            apphost:
+              - 'services/AppHost/**'
+            frontend:
+              - 'services/Frontend/**'
+            bff:
+              - 'services/Bff/**'
+            userservice:
+              - 'services/UserService/**'
+            orderservice:
+              - 'services/OrderService/**'
+
+      - name: Count modified services
+        id: count-services
+        run: |
+          services_changed=0
+          changed_services=""
+          
+          if [ "${{ steps.changes.outputs.apphost }}" == "true" ]; then
+            services_changed=$((services_changed + 1))
+            changed_services="${changed_services}AppHost, "
+          fi
+          
+          if [ "${{ steps.changes.outputs.frontend }}" == "true" ]; then
+            services_changed=$((services_changed + 1))
+            changed_services="${changed_services}Frontend, "
+          fi
+          
+          if [ "${{ steps.changes.outputs.bff }}" == "true" ]; then
+            services_changed=$((services_changed + 1))
+            changed_services="${changed_services}Bff, "
+          fi
+          
+          if [ "${{ steps.changes.outputs.userservice }}" == "true" ]; then
+            services_changed=$((services_changed + 1))
+            changed_services="${changed_services}UserService, "
+          fi
+          
+          if [ "${{ steps.changes.outputs.orderservice }}" == "true" ]; then
+            services_changed=$((services_changed + 1))
+            changed_services="${changed_services}OrderService, "
+          fi
+          
+          # Remove trailing comma and space
+          changed_services=$(echo "$changed_services" | sed 's/, $//')
+          
+          echo "services_count=$services_changed" >> $GITHUB_OUTPUT
+          echo "changed_services=$changed_services" >> $GITHUB_OUTPUT
+          
+          echo "🔍 Services modified: $services_changed"
+          echo "📋 Changed services: $changed_services"
+
+      - name: Update PR body with multi-service checkbox
+        if: steps.count-services.outputs.services_count >= 2
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const currentBody = pullRequest.body || '';
+            const servicesCount = '${{ steps.count-services.outputs.services_count }}';
+            const changedServices = '${{ steps.count-services.outputs.changed_services }}';
+            
+            // Check if the checkbox already exists
+            const checkboxPattern = /## 🚨 Multi-Service Changes Detected[\s\S]*?- \[ \] I have reviewed the cross-service impact/;
+            const hasCheckbox = checkboxPattern.test(currentBody);
+            
+            if (!hasCheckbox) {
+              const checkboxSection = [
+              '',
+              '## 🚨 Multi-Service Changes Detected',
+              '',
+              `This PR modifies **${servicesCount} services**: ${changedServices}`,
+              '',
+              '**⚠️ Important**: Changes affecting multiple services require extra attention to ensure:',
+              '- Service boundaries are maintained',
+              '- No unintended cross-service dependencies are introduced',
+              '- Changes are properly coordinated across services',
+              '',
+              '### Required Review Checklist',
+              '- [ ] I have reviewed the cross-service impact and confirmed this change is intentional',
+              '- [ ] I have verified that service isolation rules are maintained (no direct project references between services)',
+              '- [ ] I have considered the deployment implications of changing multiple services',
+              '- [ ] I have updated any relevant documentation for the affected services',
+              ''
+            ].join('\n');
+
+              const newBody = currentBody + checkboxSection;
+              
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: newBody,
+              });
+              
+              console.log('✅ Added multi-service review checkbox to PR body');
+            } else {
+              console.log('ℹ️ Multi-service checkbox already exists in PR body');
+            }
+
+      - name: Check if multi-service checkbox is checked
+        if: steps.count-services.outputs.services_count >= 2
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const body = pullRequest.body || '';
+            
+            // Check if the required checkbox is checked
+            const checkedPattern = /- \[x\] I have reviewed the cross-service impact and confirmed this change is intentional/i;
+            const isChecked = checkedPattern.test(body);
+            
+            if (!isChecked) {
+              console.log('❌ Multi-service review checkbox is not checked');
+              core.setFailed('This PR affects multiple services but the required review checkbox is not checked. Please review the cross-service impact and check the box in the PR description.');
+            } else {
+              console.log('✅ Multi-service review checkbox is checked');
+            }
+
+      - name: Add status comment for single service changes
+        if: steps.count-services.outputs.services_count < 2 && steps.count-services.outputs.services_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const servicesCount = '${{ steps.count-services.outputs.services_count }}';
+            const changedServices = '${{ steps.count-services.outputs.changed_services }}';
+            
+            // Check if we already commented
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Single Service Change Detected')
+            );
+            
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: [
+                  '## ✅ Single Service Change Detected',
+                  '',
+                  `This PR modifies **${servicesCount} service**: ${changedServices}`,
+                  '',
+                  'Since this PR only affects a single service, no additional multi-service review is required. The standard review process applies.'
+                ].join('\n')
+              });
+              
+              console.log('✅ Added single service status comment');
+            }
