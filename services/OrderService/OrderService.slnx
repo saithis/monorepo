@@ -1,49 +1,9 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.API", "src\OrderService.API\OrderService.API.csproj", "{D3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Core", "src\OrderService.Core\OrderService.Core.csproj", "{E3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure", "src\OrderService.Infrastructure\OrderService.Infrastructure.csproj", "{F3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{G3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Tests", "tests\OrderService.Tests\OrderService.Tests.csproj", "{H3B4C5D6-E7F8-9012-CDEF-345678901234}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
-		{H3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{H3B4C5D6-E7F8-9012-CDEF-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{H3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{H3B4C5D6-E7F8-9012-CDEF-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{D3B4C5D6-E7F8-9012-CDEF-345678901234} = {C3B4C5D6-E7F8-9012-CDEF-345678901234}
-		{E3B4C5D6-E7F8-9012-CDEF-345678901234} = {C3B4C5D6-E7F8-9012-CDEF-345678901234}
-		{F3B4C5D6-E7F8-9012-CDEF-345678901234} = {C3B4C5D6-E7F8-9012-CDEF-345678901234}
-		{H3B4C5D6-E7F8-9012-CDEF-345678901234} = {G3B4C5D6-E7F8-9012-CDEF-345678901234}
-	EndGlobalSection
-EndGlobal
+<?xml version="1.0" encoding="utf-8"?>
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\OrderService.API\OrderService.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\OrderService.Tests\OrderService.Tests.csproj" />
+  </Folder>
+</Solution>
