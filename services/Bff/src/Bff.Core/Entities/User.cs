@@ -1,3 +1,5 @@
+using System;
+
 namespace Bff.Core.Entities;
 
 public class User

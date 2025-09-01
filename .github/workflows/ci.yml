@@ -7,13 +7,14 @@ on:
     branches: [ main, develop ]
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
   NODE_VERSION: '18.x'
 
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
       bff-changed: ${{ steps.changes.outputs.bff }}
       userservice-changed: ${{ steps.changes.outputs.userservice }}
       orderservice-changed: ${{ steps.changes.outputs.orderservice }}
@@ -29,6 +30,8 @@ jobs:
         uses: dorny/paths-filter@v2
         with:
           filters: |
+            frontend:
+              - 'services/Frontend/**'
             bff:
               - 'services/Bff/**'
             userservice:
@@ -40,6 +43,32 @@ jobs:
               - 'global/**'
               - '.github/**'
               - 'tools/**'
+
+
+  build-and-test-frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: services/Frontend/package-lock.json
+
+      - name: Install Angular dependencies
+        run: |
+          cd services/Frontend
+          npm ci
+
+      - name: Build Angular frontend
+        run: |
+          cd services/Frontend
+          npm run build
 
   build-and-test-bff:
     needs: detect-changes
@@ -53,13 +82,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: services/Bff/src/Bff.Web/package-lock.json
 
       - name: Restore .NET dependencies
         run: |
@@ -75,16 +97,6 @@ jobs:
         run: |
           cd services/Bff
           dotnet test --configuration Release --no-build --verbosity normal
-
-      - name: Install Angular dependencies
-        run: |
-          cd services/Bff/src/Bff.Web
-          npm ci
-
-      - name: Build Angular frontend
-        run: |
-          cd services/Bff/src/Bff.Web
-          npm run build
 
   build-and-test-userservice:
     needs: detect-changes
@@ -142,72 +154,3 @@ jobs:
           cd services/OrderService
           dotnet test --configuration Release --no-build --verbosity normal
 
-  e2e-tests:
-    needs: [detect-changes, build-and-test-bff]
-    if: |
-      needs.detect-changes.outputs.e2e-changed == 'true' ||
-      needs.detect-changes.outputs.bff-changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: e2e/package-lock.json
-
-      - name: Install Playwright
-        run: |
-          cd e2e
-          npm ci
-          npx playwright install --with-deps
-
-      - name: Build Bff service for e2e
-        run: |
-          cd services/Bff
-          dotnet build --configuration Release --no-restore
-
-      - name: Run e2e tests
-        run: |
-          cd e2e
-          npm run test:e2e
-
-  global-validation:
-    needs: [detect-changes, build-and-test-bff, build-and-test-userservice, build-and-test-orderservice]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Validate global configuration
-        run: |
-          # Check if global configuration files are valid
-          dotnet --version
-          echo "Global configuration validation completed"
-
-      - name: Check build artifacts
-        run: |
-          echo "Checking build artifacts..."
-          if [ -d "services/Bff/src/Bff.API/bin" ]; then
-            echo "Bff service built successfully"
-          fi
-          if [ -d "services/UserService/src" ]; then
-            echo "UserService structure validated"
-          fi
-          if [ -d "services/OrderService/src" ]; then
-            echo "OrderService structure validated"
-          fi

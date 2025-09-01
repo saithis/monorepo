@@ -5,10 +5,7 @@
     <RootNamespace>Bff.API</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\Bff.Core\Bff.Core.csproj" />

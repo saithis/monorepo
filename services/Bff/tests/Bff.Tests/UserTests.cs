@@ -1,5 +1,6 @@
 using Bff.Core.Entities;
 using FluentAssertions;
+using System;
 using Xunit;
 
 namespace Bff.Tests;
