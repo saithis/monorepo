@@ -16,7 +16,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Hello World endpoint
-app.MapGet("/", () => "Hello World from UserService!")
+app.MapGet("/", () => "Hello World from UserService! Hope you have a nice day!")
     .WithName("GetHelloWorld")
     .WithOpenApi();
 
