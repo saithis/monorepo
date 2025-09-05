@@ -18,8 +18,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // TODO: use microsofts openapi package introduced in dotnet 9 instead of swagger
-    // TODO: use scalar instead of swaggerui
+    // TODO: Use Microsoft's OpenAPI package introduced in .NET 9 instead of Swagger.
+    // TODO: Switch to using Scalar instead of SwaggerUI.
     app.UseSwagger();
     app.UseSwaggerUI();
 }
